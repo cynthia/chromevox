@@ -143,7 +143,22 @@ build_crx() {
 main() {
   process_args "$@"
 
-  TEMP_DIR=$(mktemp -d)
+  unamestr=`uname -s`
+
+  if [[ "$unamestr" == 'Linux' ]]; then
+    prefix='-p chromevox'
+  elif [[ "$unamestr" == 'FreeBSD' ]] ||
+	   [[ "$unamestr" == 'NetBSD' ]] ||
+	   [[ "$unamestr" == 'OpenBSD' ]] ||
+	   [[ "$unamestr" == 'Darwin' ]] ||
+	   [[ "$unamestr" == 'SunOS' ]]; then
+    prefix='-t chromevox'
+  else
+    echo "Unsupported Operating System!"
+    return 1
+  fi
+
+  TEMP_DIR=`mktemp -d $prefix`
   trap "rm -rf '$TEMP_DIR'" EXIT
 
   prepare_files
